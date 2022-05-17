@@ -22,10 +22,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: {
           notEmpty: true,
-          len: [6, 12],
         },
       },
       birthDate: {
+        type: DataTypes.DATEONLY,
+      },
+      last_update_password: {
         type: DataTypes.DATEONLY,
       },
     },

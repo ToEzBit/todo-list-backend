@@ -1,11 +1,17 @@
 const { Todo } = require("../models");
 const createError = require("../utils/createError");
+const jwt = require("jsonwebtoken");
 
 exports.createTodo = async (req, res, next) => {
   try {
-    const { title, completed, dueDate, userId } = req.body;
+    const { title, completed, dueDate } = req.body;
 
-    const todo = await Todo.create({ title, completed, dueDate, userId });
+    const todo = await Todo.create({
+      title,
+      completed,
+      dueDate,
+      userId: req.user.id,
+    });
     res.status(201).json({ todo });
   } catch (err) {
     next(err);
@@ -14,9 +20,7 @@ exports.createTodo = async (req, res, next) => {
 
 exports.getAllTodo = async (req, res, next) => {
   try {
-    const { userId } = req.body;
-
-    const todos = await Todo.findAll({ where: { userId: userId } });
+    const todos = await Todo.findAll({ where: { userId: req.user.id } });
     res.status(200).json({ result: todos });
   } catch (err) {
     next(err);
@@ -25,10 +29,9 @@ exports.getAllTodo = async (req, res, next) => {
 
 exports.getTodoById = async (req, res, next) => {
   try {
-    const { userId } = req.body;
     const { id } = req.params;
 
-    const todo = await Todo.findOne({ where: { id: id, userId: userId } });
+    const todo = await Todo.findOne({ where: { id: id, userId: req.user.id } });
     res.status(200).json({ result: todo });
   } catch (err) {
     next(err);
@@ -67,9 +70,10 @@ exports.updateTodo = async (req, res, next) => {
 
 exports.deleteTodo = async (req, res, next) => {
   try {
-    const { userId } = req.body;
     const { id } = req.params;
-    const result = await Todo.destroy({ where: { id: id, userId: userId } });
+    const result = await Todo.destroy({
+      where: { id: id, userId: req.user.id },
+    });
     if (result === 0) {
       createError("todo with this id not found,400");
     }
