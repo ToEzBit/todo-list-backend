@@ -41,7 +41,7 @@ exports.getTodoById = async (req, res, next) => {
 exports.updateTodo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { userId, title, completed, dueDate } = req.body;
+    const { title, completed, dueDate } = req.body;
 
     // const newValue = {};
     // if (!title) {
@@ -56,7 +56,7 @@ exports.updateTodo = async (req, res, next) => {
 
     const result = await Todo.update(
       { title, completed, dueDate },
-      { where: { id, userId } }
+      { where: { id, userId: req.user.id } }
     );
 
     if (result[0] === 0) {
